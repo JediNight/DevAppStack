@@ -7,7 +7,7 @@ const config = require('config');
 const bcrypt = require('bcryptjs');
 
 const User = require('../../models/Users')
-
+ 
 //@route    GET api/auth
 //@desc     Test route
 //@access   Public
@@ -17,8 +17,8 @@ router.get('/', auth, async (req, res) => {
         res.json(user);
         
     } catch (error) {
-        console.error(err.message);
-        res.status();
+        console.error(error.message);
+        res.status(500).send('Server error');
     }
 });
 
@@ -36,6 +36,7 @@ router.post('/',
             return res.status(400).json({errors: errors.array()});
         }
         
+    // eslint-disable-next-line no-unused-vars
     const{ name, email, password } = req.body; //parsing email from request
 
     try {
@@ -50,7 +51,7 @@ router.post('/',
 
         if(!isMatch){
             return res.status(400).json({errors : [{ msg: 'Invalid Credentials'}]});
-        };
+        }
     //Return jsonwebtoken
         const payload = {
             user: {
@@ -76,3 +77,5 @@ router.post('/',
 );
 
 module.exports = router;
+
+

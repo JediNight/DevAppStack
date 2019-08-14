@@ -8,8 +8,8 @@ module.exports  = function(req, res, next) {
 
     //Check if no token
     if(!token){
-        return res.status(401).json,({msg: 'No token, authorization denied'});
-    };
+        return res.status(401).json({msg: 'No token, authorization denied'});
+    }
 
 //Verify token
     try{
@@ -19,7 +19,7 @@ module.exports  = function(req, res, next) {
         next();
     } catch(err) {
         res.status(401).json({msg: 'Token is not valid' });
-    };
+    }
 };
 
 //"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNWQ0NjM1NjlhOWNmZTI0Mzc0ZTAzNGY1In0sImlhdCI6MTU2NDg4MjI4MSwiZXhwIjoxNTY1MjQyMjgxfQ.MHUO21OTMWr0EzWxSiE0Fo-1wNhMbOA9VUQyf2tdUxY
