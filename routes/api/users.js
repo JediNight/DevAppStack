@@ -23,7 +23,7 @@ router.post('/',
             return res.status(400).json({errors: errors.array()});
         }
         
-    const{ name, email, password } = req.body; //parsing email from request
+    const{ name, email, password } = req.body; //parsing email from request aka destructuring
 
     try {
     //See if users exists
