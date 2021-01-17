@@ -80,7 +80,7 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_LARGE
-        Image: aws/codebuild/nodejs:14.x
+        Image: aws/codebuild/standard:5.0
 
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
@@ -96,7 +96,7 @@ Resources:
         # ComputeType options: BUILD_GENERAL1_SMALL, BUILD_GENERAL1_MEDIUM, BUILD_GENERAL1_LARGE
         ComputeType: BUILD_GENERAL1_SMALL
         # Run `aws codebuild list-curated-environment-images` for a complete list of images provided.
-        Image: aws/codebuild/nodejs:14.x
+        Image: aws/codebuild/standard:5.0
       Source:
         Type: CODEPIPELINE
       TimeoutInMinutes: 10
