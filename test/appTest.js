@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 var expect = require("chai").expect;
 // let app = require("../src/server");
 const request = require("request");
