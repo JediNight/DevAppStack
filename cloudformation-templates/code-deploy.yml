@@ -27,14 +27,14 @@ Resources:
     Properties:
       GroupDescription: Open ports 22 and 80
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: '22'
-        ToPort: '22'
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: '80'
-        ToPort: '80'
-        CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
 
   EC2InstanceRole:
     Type: "AWS::IAM::Role"
@@ -42,8 +42,7 @@ Resources:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          -
-            Effect: "Allow"
+          - Effect: "Allow"
             Principal:
               Service:
                 - "ec2.amazonaws.com"
@@ -51,13 +50,11 @@ Resources:
               - "sts:AssumeRole"
       Path: "/"
       Policies:
-        -
-          PolicyName: EC2DeployPolicy
+        - PolicyName: EC2DeployPolicy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              -
-                Effect: Allow
+              - Effect: Allow
                 Action:
                   - "s3:Get*"
                   - "s3:List*"
@@ -75,24 +72,27 @@ Resources:
       IamInstanceProfile: !Ref EC2InstanceProfile
       InstanceType: t2.micro
       ImageId: ami-b70554c8
-      LaunchConfigurationName: !Join [ '-' , [ !Ref GitHubRepoName, !Ref GitHubBranch, 'LaunchConfiguration' ] ]
+      LaunchConfigurationName:
+        !Join [
+          "-",
+          [!Ref GitHubRepoName, !Ref GitHubBranch, "LaunchConfiguration"],
+        ]
       SecurityGroups:
-      - Ref: InstanceSecurityGroup
+        - Ref: InstanceSecurityGroup
       UserData:
-        Fn::Base64:
-          !Sub |
-            #!/bin/bash -xe
-            yum -y update
-            yum install -y ruby
-            yum install -y aws-cli
-            curl --silent --location https://rpm.nodesource.com/setup_6.x | sudo bash -
-            sudo yum -y install nodejs
-            cd /var
-            mkdir nodeapp
-            cd /home/ec2-user
-            wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
-            chmod +x ./install
-            ./install auto
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum -y update
+          yum install -y ruby
+          yum install -y aws-cli
+          curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash -
+          sudo yum -y install nodejs
+          cd /var
+          mkdir nodeapp
+          cd /home/ec2-user
+          wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
+          chmod +x ./install
+          ./install auto
 
   AutoScaleGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
@@ -105,9 +105,8 @@ Resources:
       LoadBalancerNames:
         - !Ref LoadBalancer
       Tags:
-        -
-          Key: name
-          Value: !Join [ '-' , [ !Ref GitHubRepoName, !Ref GitHubBranch ] ]
+        - Key: name
+          Value: !Join ["-", [!Ref GitHubRepoName, !Ref GitHubBranch]]
           PropagateAtLaunch: true
 
   LoadBalancer:
@@ -116,11 +115,11 @@ Resources:
       AvailabilityZones:
         Fn::GetAZs: "us-east-1"
       SecurityGroups:
-      - !GetAtt InstanceSecurityGroup.GroupId
+        - !GetAtt InstanceSecurityGroup.GroupId
       Listeners:
-      - LoadBalancerPort: '80'
-        InstancePort: '80'
-        Protocol: HTTP
+        - LoadBalancerPort: "80"
+          InstancePort: "80"
+          Protocol: HTTP
       HealthCheck:
         HealthyThreshold: 2
         Interval: 30
@@ -166,7 +165,7 @@ Resources:
   DeployApplication:
     Type: "AWS::CodeDeploy::Application"
     Properties:
-      ApplicationName: !Join [ '-' , [ !Ref GitHubRepoName, !Ref GitHubBranch ] ]
+      ApplicationName: !Join ["-", [!Ref GitHubRepoName, !Ref GitHubBranch]]
 
   DeploymentGroup:
     Type: AWS::CodeDeploy::DeploymentGroup
@@ -174,10 +173,10 @@ Resources:
     Properties:
       ApplicationName: !Ref DeployApplication
       DeploymentConfigName: CodeDeployDefault.AllAtOnce
-      DeploymentGroupName: !Join [ '-' , [ !Ref GitHubRepoName, !Ref GitHubBranch ] ]
+      DeploymentGroupName: !Join ["-", [!Ref GitHubRepoName, !Ref GitHubBranch]]
       Ec2TagFilters:
         - Key: name
-          Value: !Join [ '-' , [ !Ref GitHubRepoName, !Ref GitHubBranch ] ]
+          Value: !Join ["-", [!Ref GitHubRepoName, !Ref GitHubBranch]]
           Type: KEY_AND_VALUE
       ServiceRoleArn: !GetAtt [CodeDeployTrustRole, Arn]
 
